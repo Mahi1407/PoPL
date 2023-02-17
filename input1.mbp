@@ -1,0 +1,59 @@
+#include<stdio.h>
+#include<string.h>
+
+numeric main() {
+    numeric x=2;
+    switch (1)
+    {
+    case 1:
+        x=1;
+        break;
+    case 2:
+        x=5;
+        break;
+    default:
+        x=0;
+        break;
+    }
+     numeric a;
+    numeric x1=1.0000;
+    numeric y=2;
+     numeric z=3;
+     x=3;
+    y=10;
+    z=5;
+    numeric ww=2;
+    while(ww<5){
+        ww++;
+    }
+    loop(numeric i=0; i<z;i++) {
+            a=1;
+    }
+    loop1(numeric j=0; j<z;) {
+            a=1;
+    }
+    numeric k=0;
+    loop2(; k<z;) {
+            a=1;
+    }
+    when(x>5){
+        loop(numeric k1=0; k1<10; k1++) {
+            y = x+3;
+            write("Hello!");
+        }
+    } other_wise {
+        numeric idx = 1;
+    }
+    loop(numeric i1=0; i<10; i++) {
+        write("Hello World!");
+        read("%d", &x);
+        when (x>5) {
+            write("Hi");
+        }
+        loop(numeric j1=0; j<z; j++) {
+            a=1;
+        }
+    } 
+    numeric pp=10;
+    back 1 ;
+}

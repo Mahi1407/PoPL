@@ -14,4 +14,4 @@ yacc_build:
 run: 
 	@make -s yacc_gen
 	@make -s yacc_build
-	type input1.c|.\a.exe
+	type input1.mbp|.\a.exe

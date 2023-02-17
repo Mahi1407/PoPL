@@ -69,7 +69,14 @@
      SUBTRACT = 285,
      UNARY = 286,
      INCLUDE = 287,
-     RETURN = 288
+     RETURN = 288,
+     WHILE = 289,
+     SWITCH = 290,
+     FOR1 = 291,
+     FOR2 = 292,
+     CASE = 293,
+     BREAK = 294,
+     DEFAULT = 295
    };
 #endif
 
@@ -81,11 +88,11 @@ typedef union YYSTYPE
 
 /* Line 1676 of yacc.c  */
 #line 46 "parser.y"
- struct var_name { 
+ 
+		struct var_name { 
 			char name[100]; 
 			struct node* nd;
 		} nd_obj;
-
 		struct var_name2 { 
 			char name[100]; 
 			struct node* nd;
@@ -95,7 +102,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 99 "parser.h"
+#line 106 "parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

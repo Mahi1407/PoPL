@@ -10,16 +10,24 @@ unary "++"|"--"
 
 %%
 
-"printf"                    { strcpy(yylval.nd_obj.name,(yytext)); return PRINTFF; }
-"scanf"                     { strcpy(yylval.nd_obj.name,(yytext)); return SCANFF; }
-"int"                       { strcpy(yylval.nd_obj.name,(yytext)); return INT; }
-"float"                     { strcpy(yylval.nd_obj.name,(yytext)); return FLOAT; }
+"write"                    { strcpy(yylval.nd_obj.name,(yytext)); return PRINTFF; }
+"read"                     { strcpy(yylval.nd_obj.name,(yytext)); return SCANFF; }
+"numeric"                       { strcpy(yylval.nd_obj.name,(yytext)); return INT; }
+"decimal"                     { strcpy(yylval.nd_obj.name,(yytext)); return FLOAT; }
 "char"                      { strcpy(yylval.nd_obj.name,(yytext)); return CHAR; }
+"case"                      { strcpy(yylval.nd_obj.name,(yytext)); return CASE; }
+"switch"                      { strcpy(yylval.nd_obj.name,(yytext)); return SWITCH; }
+"break"                       { strcpy(yylval.nd_obj.name,(yytext)); return BREAK; }
 "void"                      { strcpy(yylval.nd_obj.name,(yytext)); return VOID; }
-"return"                    { strcpy(yylval.nd_obj.name,(yytext)); return RETURN; }
-"for"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR; }
-"if"	                    { strcpy(yylval.nd_obj.name,(yytext)); return IF; }
-"else"	                    { strcpy(yylval.nd_obj.name,(yytext)); return ELSE; }
+"back"                    { strcpy(yylval.nd_obj.name,(yytext)); return RETURN; }
+"loop"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR; }
+"loop1"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR1; }
+"loop2"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR2; }
+"switch"	                    { strcpy(yylval.nd_obj.name,(yytext)); return SWITCH; }
+"default"	                    { strcpy(yylval.nd_obj.name,(yytext)); return DEFAULT; }
+"while"	                    { strcpy(yylval.nd_obj.name,(yytext)); return WHILE; }
+"when"	                    { strcpy(yylval.nd_obj.name,(yytext)); return IF; }
+"other_wise"	                    { strcpy(yylval.nd_obj.name,(yytext)); return ELSE; }
 ^"#include"[ ]*<.+\.h>      { strcpy(yylval.nd_obj.name,(yytext)); return INCLUDE; }
 "true"                      { strcpy(yylval.nd_obj.name,(yytext)); return TRUE; }
 "false"                     { strcpy(yylval.nd_obj.name,(yytext)); return FALSE; }
