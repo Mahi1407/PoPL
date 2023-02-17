@@ -80,7 +80,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 48 "parser.y"
+#line 46 "parser.y"
  struct var_name { 
 			char name[100]; 
 			struct node* nd;

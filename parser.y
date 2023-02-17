@@ -25,6 +25,7 @@
         int line_no;
 	} symbol_table[40];
     int count=0;
+	int syn_error=0;
     int q;
 	char type[10];
     extern int countn;
@@ -265,22 +266,40 @@ return: RETURN { add('K'); } value ';' { check_return_type($3.name); $1.nd = mkn
 int main() {
     yyparse();
     printf("\n\n");
-	printf("\t\t\t\t\t\t\t\t PHASE 1: LEXICAL ANALYSIS \n\n");
-	printf("\nSYMBOL   DATATYPE   TYPE   LINE NUMBER \n");
-	printf("_______________________________________\n\n");
+	
+	printf("\t\t\t\t STEP 1: LEXICAL ANALYSIS  \n\n\n");
+	
+	printf("Processing....\n");
+	printf("\nLexical analysis completed with no errors\n");
+
+	printf("\n\n\t\t\t\t\t SYMBOL TABLE \n");
+	printf("\n\nSYMBOL   \t\t\tDATATYPE   \t\t\tTYPE   \t\t\t\tLINE NUMBER \n");
+	printf("___________________________________________________________________________________________________________\n\n");
 	int i=0;
+	
 	for(i=0; i<count; i++) {
-		printf("%s\t%s\t%s\t%d\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].line_no);
+		// line_ = symbol_table[i].line_no;
+		printf("%s\t\t\t\t%s\t\t\t\t%s\t\t\t\t%d\t\t\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].line_no);
 	}
+	
+	
+
 	for(i=0;i<count;i++) {
 		free(symbol_table[i].id_name);
 		free(symbol_table[i].type);
 	}
 	printf("\n\n");
-	printf("\t\t\t\t\t\t\t\t PHASE 2: SYNTAX ANALYSIS \n\n");
+	printf("\t\t\t\t STEP 2: SYNTAX ANALYSIS \n\n");
+	printf("Processing....\n\n");
+	if(syn_error){
+		printf("Syntax error found ");
+		// printf(line_);
+	}else
+		printf("Syntax analysis is completed with no errors\n\n");
+
 	print_tree(head); 
 	printf("\n\n\n\n");
-	printf("\t\t\t\t\t\t\t\t PHASE 3: SEMANTIC ANALYSIS \n\n");
+	printf("\t\t\t\t STEP 3: SEMANTIC ANALYSIS \n\n");
 	if(sem_errors>0) {
 		printf("Semantic analysis completed with %d errors\n", sem_errors);
 		for(int i=0; i<sem_errors; i++){
@@ -289,7 +308,6 @@ int main() {
 	} else {
 		printf("Semantic analysis completed with no errors");
 	}
-	printf("\n\n");
 }
 
 int search(char *type) {
@@ -440,4 +458,5 @@ void insert_type() {
 
 void yyerror(const char* msg) {
     fprintf(stderr, "%s\n", msg);
+	syn_error=1;
 }
