@@ -287,7 +287,7 @@ value: NUMBER { strcpy($$.name, $1.name); sprintf($$.type, "numeric"); add('C');
 ;
 
 return: RETURN { add('K'); } value ';' { check_return_type($3.name); $1.nd = mknode(NULL, NULL, "return"); $$.nd = mknode($1.nd, $3.nd, "RETURN"); }
-| { $$.nd = NULL; }
+//| { $$.nd = NULL; }
 ;
 
 %%
