@@ -2,32 +2,7 @@
 #include<string.h>
 
 int main() {
-    int x=0;
-    x<5;
-    //bool b=x>5;
-    // int x=1;
-    // int y=2;
-    // int z=3;
-    // x=3;
-    // y=10;
-    // z=5;
-    // if(x>5) {
-    //     for(int k=0; k<10; k++) {
-    //         y = x+3;
-    //         printf("Hello!");
-    //     }
-    // } else {
-    //     int idx = 1;
-    // }
-    // for(int i=0; i<10; i++) {
-    //     printf("Hello World!");
-    //     scanf("%d", &x);
-    //     if (x>5) {
-    //         printf("Hi");
-    //     }
-    //     for(int j=0; j<z; j++) {
-    //         a=1;
-    //     }
-    // } 
-    return 0;
+    //int x=0;
+    int x = 5;
+    return 5;
 }

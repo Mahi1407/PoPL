@@ -12,36 +12,28 @@
     int search(char *);
 	void insert_type();
 	void print_tree(struct node*);
-	void print_tree_util(struct node*, int);
 	void print_inorder(struct node *);
     void check_declaration(char *);
 	void check_return_type(char *);
 	int check_types(char *, char *);
 	char *get_type(char *);
 	struct node* mknode(struct node *left, struct node *right, char *token);
-
     struct dataType {
         char * id_name;
         char * data_type;
         char * type;
         int line_no;
 	} symbol_table[40];
-
     int count=0;
     int q;
 	char type[10];
     extern int countn;
 	struct node *head;
 	int sem_errors=0;
-	int ic_idx=0;
-	int temp_var=0;
 	int label=0;
-	int is_for=0;
 	char buff[100];
 	char errors[10][100];
 	char reserved[10][10] = {"int", "float", "char", "void", "if", "else", "for", "main", "return", "include"};
-	char icg[50][100];
-
 	struct node { 
 		struct node *left; 
 		struct node *right; 
@@ -60,19 +52,11 @@
 			struct node* nd;
 			char type[5];
 		} nd_obj2; 
-
-		struct var_name3 {
-			char name[100];
-			struct node* nd;
-			char if_body[5];
-			char else_body[5];
-		} nd_obj3;
 	} 
 %token VOID 
 %token <nd_obj> CHARACTER PRINTFF SCANFF INT FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN 
-%type <nd_obj> headers main body return datatype statement arithmetic relop program else
+%type <nd_obj> headers main body return datatype statement arithmetic relop program else condition
 %type <nd_obj2> init value expression
-%type <nd_obj3> condition
 
 %%
 
@@ -94,18 +78,14 @@ datatype: INT { insert_type(); }
 | VOID { insert_type(); }
 ;
 
-body: FOR { add('K'); is_for = 1; } '(' statement ';' condition ';' statement ')' '{' body '}' { 
+body: FOR { add('K'); } '(' statement ';' condition ';' statement ')' '{' body '}' { 
 	struct node *temp = mknode($6.nd, $8.nd, "CONDITION"); 
 	struct node *temp2 = mknode($4.nd, temp, "CONDITION"); 
 	$$.nd = mknode(temp2, $11.nd, $1.name); 
-	sprintf(icg[ic_idx++], buff);
-	sprintf(icg[ic_idx++], "JUMP to %s\n", $6.if_body);
-	sprintf(icg[ic_idx++], "\nLABEL %s:\n", $6.else_body);
 }
-| IF { add('K'); is_for = 0; } '(' condition ')' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.if_body); } '{' body '}' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.else_body); } else { 
-	struct node *iff = mknode($4.nd, $8.nd, $1.name); 
-	$$.nd = mknode(iff, $11.nd, "if-else"); 
-	sprintf(icg[ic_idx++], "GOTO next\n");
+| IF { add('K'); } '(' condition ')' '{' body '}' else { 
+	struct node *iff = mknode($4.nd, $7.nd, $1.name); 
+	$$.nd = mknode(iff, $9.nd, "if-else"); 
 }
 | statement ';' { $$.nd = $1.nd; }
 | body body { $$.nd = mknode($1.nd, $2.nd, "statements"); }
@@ -117,19 +97,7 @@ else: ELSE { add('K'); } '{' body '}' { $$.nd = mknode(NULL, $4.nd, $1.name); }
 | { $$.nd = NULL; }
 ;
 
-condition: value relop value { 
-	$$.nd = mknode($1.nd, $3.nd, $2.name); 
-	if(is_for) {
-		sprintf($$.if_body, "L%d", label++);
-		sprintf(icg[ic_idx++], "\nLABEL %s:\n", $$.if_body);
-		sprintf(icg[ic_idx++], "\nif NOT (%s %s %s) GOTO L%d\n", $1.name, $2.name, $3.name, label);
-		sprintf($$.else_body, "L%d", label++);
-	} else {
-		sprintf(icg[ic_idx++], "\nif (%s %s %s) GOTO L%d else GOTO L%d\n", $1.name, $2.name, $3.name, label, label+1);
-		sprintf($$.if_body, "L%d", label++);
-		sprintf($$.else_body, "L%d", label++);
-	}
-}
+condition: value relop value { $$.nd = mknode($1.nd, $3.nd, $2.name); }
 | TRUE { add('K'); $$.nd = NULL; }
 | FALSE { add('K'); $$.nd = NULL; }
 | { $$.nd = NULL; }
@@ -167,7 +135,6 @@ statement: datatype ID { add('V'); } init {
 	else { 
 		$$.nd = mknode($2.nd, $4.nd, "declaration"); 
 	} 
-	sprintf(icg[ic_idx++], "%s = %s\n", $2.name, $4.name);
 }
 | ID { check_declaration($1.name); } '=' expression {
 	$1.nd = mknode(NULL, NULL, $1.name); 
@@ -209,32 +176,18 @@ statement: datatype ID { add('V'); } init {
 	else {
 		$$.nd = mknode($1.nd, $4.nd, "="); 
 	}
-	sprintf(icg[ic_idx++], "%s = %s\n", $1.name, $4.name);
 }
-| ID { check_declaration($1.name); } relop expression { $1.nd = mknode(NULL, NULL, $1.name);printf($1.name); $$.nd = mknode($1.nd, $4.nd, $3.name); }
+| ID { check_declaration($1.name); } relop expression { $1.nd = mknode(NULL, NULL, $1.name); $$.nd = mknode($1.nd, $4.nd, $3.name); }
 | ID { check_declaration($1.name); } UNARY { 
 	$1.nd = mknode(NULL, NULL, $1.name); 
 	$3.nd = mknode(NULL, NULL, $3.name); 
 	$$.nd = mknode($1.nd, $3.nd, "ITERATOR");  
-	if(!strcmp($3.name, "++")) {
-		sprintf(buff, "t%d = %s + 1\n%s = t%d\n", temp_var, $1.name, $1.name, temp_var++);
-	}
-	else {
-		sprintf(buff, "t%d = %s + 1\n%s = t%d\n", temp_var, $1.name, $1.name, temp_var++);
-	}
 }
 | UNARY ID { 
 	check_declaration($2.name); 
 	$1.nd = mknode(NULL, NULL, $1.name); 
 	$2.nd = mknode(NULL, NULL, $2.name); 
 	$$.nd = mknode($1.nd, $2.nd, "ITERATOR"); 
-	if(!strcmp($1.name, "++")) {
-		sprintf(buff, "t%d = %s + 1\n%s = t%d\n", temp_var, $2.name, $2.name, temp_var++);
-	}
-	else {
-		sprintf(buff, "t%d = %s - 1\n%s = t%d\n", temp_var, $2.name, $2.name, temp_var++);
-
-	}
 }
 ;
 
@@ -279,9 +232,6 @@ expression: expression arithmetic expression {
 			$$.nd = mknode(temp, $3.nd, $2.name);
 		}
 	}
-	sprintf($$.name, "t%d", temp_var);
-	temp_var++;
-	sprintf(icg[ic_idx++], "%s = %s %s %s\n",  $$.name, $1.name, $2.name, $3.name);
 }
 | value { strcpy($$.name, $1.name); sprintf($$.type, $1.type); $$.nd = $1.nd; }
 ;
@@ -338,11 +288,6 @@ int main() {
 		}
 	} else {
 		printf("Semantic analysis completed with no errors");
-	}
-	printf("\n\n");
-	printf("\t\t\t\t\t\t\t   PHASE 4: INTERMEDIATE CODE GENERATION \n\n");
-	for(int i=0; i<ic_idx; i++){
-		printf("%s", icg[i]);
 	}
 	printf("\n\n");
 }
@@ -464,8 +409,8 @@ void add(char c) {
 }
 
 struct node* mknode(struct node *left, struct node *right, char *token) {	
-	struct node *newnode = (struct node *)malloc(sizeof(struct node));
-	char *newstr = (char *)malloc(strlen(token)+1);
+	struct node *newnode = (struct node *) malloc(sizeof(struct node));
+	char *newstr = (char *) malloc(strlen(token)+1);
 	strcpy(newstr, token);
 	newnode->left = left;
 	newnode->right = right;
@@ -474,7 +419,6 @@ struct node* mknode(struct node *left, struct node *right, char *token) {
 }
 
 void print_tree(struct node* tree) {
-	// print_tree_util(tree, 0);
 	printf("\n\nInorder traversal of the Parse Tree is: \n\n");
 	print_inorder(tree);
 }
@@ -488,17 +432,6 @@ void print_inorder(struct node *tree) {
 	if (tree->right) {
 		print_inorder(tree->right);
 	}
-}
-
-void print_tree_util(struct node *root, int space) {
-    if(root == NULL)
-        return;
-    space += 7;
-    print_tree_util(root->right, space);
-    for (int i = 7; i < space; i++)
-        printf(" ");
-	printf("%s\n", root->token);
-    print_tree_util(root->left, space);
 }
 
 void insert_type() {
