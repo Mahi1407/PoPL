@@ -4,7 +4,7 @@
 int ex(node *p){
     // printf("vv %s\n",p->name);
     if(!p){
-       // printf("NULL\n");
+       printf("NULL\n");
         return 0;
     }
     // else if(p->left==NULL && p->right==NULL){
@@ -94,6 +94,35 @@ int ex(node *p){
     }else if(strcmp(p->name,"other_wise")==0){
            ex(p->left);
            return 0;
+    }
+    else if(strcmp(p->name,"switch")==0){
+             int b=1;
+             int i=ex(p->left);
+             p=p->right;
+             node *t=p;
+             if(p->left){
+                p=p->left;
+                while(b){
+                    int j=ex(p->left->left);  
+                    if(j==i){
+                        b=0;
+                       ex(p->left->right);
+                    }else{
+                        p=p->right;
+                        if(strcmp(p->name,"case")==0){
+                            if(ex(p->left)==i){
+                                b=0;
+                                ex(p->right);
+                            }
+                            break;
+                        }
+                    }
+                }
+             }
+             if(b){
+                ex(t->right->right);
+             }
+             return 0;
     }
     return 0;
 }

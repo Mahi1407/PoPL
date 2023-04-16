@@ -49,7 +49,7 @@
 	} 
 %token VOID 
 %token <nd_obj> CHARACTER PRINTFF SCANFF INT FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN WHILE SWITCH  CASE  BREAK DEFAULT ELSEIF
-%type <nd_obj> headers main body return datatype statement arithmetic relop program elseif condition case  caselist break default temp1 temp2 
+%type <nd_obj> headers main body return datatype statement arithmetic relop program elseif condition case  break  temp1 temp2 caselist default
 %type <nd_obj2> init value expression
 %left GE LE EQ NE GT LT 
 %left ADD SUBTRACT 
@@ -80,7 +80,7 @@ body: FOR { add('K'); } '('temp1 temp2 condition temp2 temp1 ')' '{' body '}' {
 	struct node *temp2 = mknode($4.nd, temp, "CONDITION"); 
 	$$.nd = mknode(temp2, $11.nd, $1.name); 
 } 
-|SWITCH { add('K'); } '('value')' '{'caselist'}' {
+|SWITCH { add('K'); } '('value')' '{' caselist '}' {
 	$$.nd = mknode($4.nd, $7.nd, $1.name); 
 }
 |WHILE { add('K'); } '('condition')' '{' body '}' { 
@@ -98,19 +98,20 @@ body: FOR { add('K'); } '('temp1 temp2 condition temp2 temp1 ')' '{' body '}' {
 
 break:BREAK { add('K'); } ';'{$$.nd=mknode(NULL,NULL,"break");};
 
-case:CASE { add('K'); } value ':' body break {
-	struct node *temp=mknode($5.nd,$6.nd,"case_body");
-	$$.nd=mknode($3.nd,temp,$1.name);
+case:CASE { add('K'); } value ':' body break  {
+	//struct node *temp=mknode($5.nd,$6.nd,"case_body");
+	$$.nd=mknode($3.nd,$5.nd,$1.name);
 }
-|case case{$$.nd=mknode($1.nd,$2.nd,"cases")} 
+|case case{$$.nd=mknode($1.nd,$2.nd,"cases")}
+|{$$.nd=NULL}
 ;
 
 default:DEFAULT {add('K')} ':' body break {
-	struct node *temp=mknode($4.nd,$5.nd,"case_body");
-	$$.nd=mknode(NULL,temp,$1.name)
+	//struct node *temp=mknode($4.nd,$5.nd,"case_body");
+	$$.nd=mknode(NULL,$4.nd,$1.name)
 };
 
-caselist:case  default {$$.nd=mknode($1.nd,$2.nd,"caselist")};
+caselist:case  default {$$.nd=mknode($1.nd,$2.nd,"cases")};
 
 
 elseif: ELSEIF { add('K'); } '(' condition ')' '{' body '}' elseif {
