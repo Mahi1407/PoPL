@@ -72,11 +72,10 @@
      RETURN = 288,
      WHILE = 289,
      SWITCH = 290,
-     FOR1 = 291,
-     FOR2 = 292,
-     CASE = 293,
-     BREAK = 294,
-     DEFAULT = 295
+     CASE = 291,
+     BREAK = 292,
+     DEFAULT = 293,
+     ELSEIF = 294
    };
 #endif
 
@@ -102,7 +101,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 106 "parser.h"
+#line 105 "parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -1,80 +1,40 @@
 #include<stdio.h>
 #include<string.h>
-
 numeric main() {
-
-    numeric a;  //declaration
-
-    write("Hello World!"); //printf
-
-    read("%d", &a);         //scanf
-
-    when (a>5) {            //if condition
-        write("Hi");
+    numeric c=10;
+    numeric a;
+    a=10;
+    loop(;c<10;){
+        a=0;
     }
-
-    a=10;       //assignment
-
-    numeric x=2;    //numeric declartion and assignment
-
-    char c='k';     // char declaration and assignment
-
-    decimal x2=1.0000; //decimal declaration and assignment
-
-    
-    switch (1)      /*switch*/
-    {
-    case 1:
-        x=1;
-        break;
-    case 2:
-        x=5;
-        break;
-    default:
-        x=0;
-        break;
+    loop(c=1;c<10;){
+        a=1;
     }
-    
-    
-
-    //While
-    numeric ww=2; 
-    while(ww<5){
-        ww++;
+    loop(c=1;c<10;c++){
+        a=2;
     }
-
-    //loop
-    loop(numeric k=0; k<5;k++){    
-            a=1;
-     }
-
-    //loop1
-    loop1(numeric k1=0; k1<5;) {
-            a=1;
+    when(c<10){
+        a=3;
+    }when-other_wise (c==10){
+        a=4;
     }
-
-    //loop2
-    numeric k2=0;
-    loop2(; k2<8;) {
-            a=1;
+    switch(c){
+        case 1: 
+            a=5;
+            break;
+        case 2:
+            a=6;
+            break;
+        default:
+            a=7;
+            break;
     }
-
-    //if-else 
-    when(x>5){
-        loop(numeric k4=0; k4<10; k4++) {
-            a = a+3;
-            write("Hello!");
-        }
-    } other_wise {
-        numeric idx = 1;
+    repeat(c<10){
+        a=11;
+        c++;
     }
-
-    loop(numeric k5=0; k5<10; k5++) {
-       
-        loop(numeric k6=0; k6<5; k6++) {
-            a=1;
-        }
-    } 
-    numeric pp=10;
+    when(c<10){
+        a=12;
+    }
     back 1 ;
 }

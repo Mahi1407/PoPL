@@ -21,13 +21,12 @@ unary "++"|"--"
 "void"                      { strcpy(yylval.nd_obj.name,(yytext)); return VOID; }
 "back"                    { strcpy(yylval.nd_obj.name,(yytext)); return RETURN; }
 "loop"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR; }
-"loop1"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR1; }
-"loop2"	                    { strcpy(yylval.nd_obj.name,(yytext)); return FOR2; }
 "switch"	                    { strcpy(yylval.nd_obj.name,(yytext)); return SWITCH; }
 "default"	                    { strcpy(yylval.nd_obj.name,(yytext)); return DEFAULT; }
-"while"	                    { strcpy(yylval.nd_obj.name,(yytext)); return WHILE; }
+"repeat"	                    { strcpy(yylval.nd_obj.name,(yytext)); return WHILE; }
 "when"	                    { strcpy(yylval.nd_obj.name,(yytext)); return IF; }
 "other_wise"	                    { strcpy(yylval.nd_obj.name,(yytext)); return ELSE; }
+"when-other_wise"	                    { strcpy(yylval.nd_obj.name,(yytext)); return ELSEIF; }
 ^"#include"[ ]*<.+\.h>      { strcpy(yylval.nd_obj.name,(yytext)); return INCLUDE; }
 "true"                      { strcpy(yylval.nd_obj.name,(yytext)); return TRUE; }
 "false"                     { strcpy(yylval.nd_obj.name,(yytext)); return FALSE; }
