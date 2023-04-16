@@ -1,5 +1,5 @@
 lex_gen:
-	flex -olexer.c lexer.l
+	flex -ozlexer.c lexer.l
 
 yacc_gen:
 	@make -s lex_gen
@@ -9,7 +9,7 @@ clear:
 	cls
 
 yacc_build:
-	gcc -w parser.c
+	gcc -w parser.c interpreter.c
 
 run: 
 	@make -s yacc_gen

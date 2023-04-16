@@ -1,40 +1,9 @@
 #include<stdio.h>
 #include<string.h>
-numeric main() {
-    numeric c=10;
-    numeric a;
-    a=10;
-    loop(;c<10;){
-        a=0;
-    }
-    loop(c=1;c<10;){
-        a=1;
-    }
-    loop(c=1;c<10;c++){
-        a=2;
-    }
-    when(c<10){
-        a=3;
-    }when-other_wise (c==10){
-        a=4;
-    }
-    switch(c){
-        case 1: 
-            a=5;
-            break;
-        case 2:
-            a=6;
-            break;
-        default:
-            a=7;
-            break;
-    }
-    repeat(c<10){
-        a=11;
-        c++;
-    }
-    when(c<10){
-        a=12;
-    }
-    back 1 ;
+
+numeric main() { 
+    
+   
+
+    back 0;
 }

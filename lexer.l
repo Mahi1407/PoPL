@@ -10,7 +10,7 @@ unary "++"|"--"
 
 %%
 
-"write"                    { strcpy(yylval.nd_obj.name,(yytext)); return PRINTFF; }
+"write"                    { strcpy(yylval.nd_obj.name,(yytext)); return PRINT; }
 "read"                     { strcpy(yylval.nd_obj.name,(yytext)); return SCANFF; }
 "numeric"                       { strcpy(yylval.nd_obj.name,(yytext)); return INT; }
 "decimal"                     { strcpy(yylval.nd_obj.name,(yytext)); return FLOAT; }
