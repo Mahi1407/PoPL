@@ -9,7 +9,6 @@ digit [0-9]
 unary "++"|"--"
 
 %%
-
 "write"                    { strcpy(yylval.nd_obj.name,(yytext)); return PRINT; }
 "read"                     { strcpy(yylval.nd_obj.name,(yytext)); return SCANFF; }
 "numeric"                       { strcpy(yylval.nd_obj.name,(yytext)); return INT; }

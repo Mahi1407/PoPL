@@ -4,7 +4,7 @@
 int ex(node *p){
     // printf("vv %s\n",p->name);
     if(!p){
-       printf("NULL\n");
+        // printf("NULL\n");
         return 0;
     }
     // else if(p->left==NULL && p->right==NULL){
@@ -15,10 +15,22 @@ int ex(node *p){
     //     ex(p->left);
     //     ex(p->right);
     // }
+    else if(strcmp(p->name,"function")==0){
+            ex(p->right);
+    }
+    else if(strcmp(p->name,"func_args_body")==0){
+            ex(p->left);
+            ex(p->right);
+    }
+    else if(strcmp(p->name,"func_body")==0){
+            ex(p->left);
+            ex(p->right);
+    }
     else if(strcmp(p->name,"program")==0){
                 ex(p->right);
                 return 0;
-    }else if(strcmp(p->name,"main")==0){
+    }
+    else if(strcmp(p->name,"main")==0){
                 ex(p->left);
                 ex(p->right);
                 return 0;
@@ -126,3 +138,19 @@ int ex(node *p){
     }
     return 0;
 }
+
+void traverse(node *p){
+   if(!p){
+        return ;
+    }
+    else{
+        if(strcmp(p->name,"function")==0){
+            function_table[p->f_index].func_root=p;
+        }
+        traverse(p->left);
+        traverse(p->right);
+    }
+    
+}
+
+

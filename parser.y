@@ -8,7 +8,7 @@
     void yyerror(const char *s);
     int yylex();
     int yywrap();
-    int add(char);
+    void add(char);
     void insert_type();
     int search(char *);
 	void insert_type();
@@ -16,6 +16,7 @@
 	void print_inorder(struct node *);
     int check_declaration(char *);
 	int get_index(char *);
+	int get_findex(char *);
 	void check_return_type(char *);
 	int check_types(char *, char *);
 	char *get_type(char *);
@@ -26,12 +27,17 @@
 	char type[10];
     extern int countn;
 	struct node *head;
+	struct node *head1;
 	int sem_errors=0;
 	int label=0;
 	char buff[100];
 	char errors[10][100];
 	char reserved[20][10] = {"numeric", "decimal", "char", "back", "when", "other_wise", "loop", "main", "back", "include","case","default"};
 	int gg;
+	int ff;
+	void add_fname();
+	int search_fname(char *);
+	int f_c=0;
 
 %}
 
@@ -49,26 +55,58 @@
 	} 
 %token VOID 
 %token <nd_obj> CHARACTER PRINTFF SCANFF INT FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN WHILE SWITCH  CASE  BREAK DEFAULT ELSEIF
-%type <nd_obj> headers main body return datatype statement arithmetic relop program elseif condition case  break  temp1 temp2 caselist default
+%type <nd_obj> headers  body return datatype statement arithmetic relop program elseif condition case  break  temp1 temp2 caselist default func functlist args arg
 %type <nd_obj2> init value expression
 %left GE LE EQ NE GT LT 
 %left ADD SUBTRACT 
 %left MULTIPLY DIVIDE 
 %%
 
-program: headers main '(' ')' '{' body return '}' { $2.nd = mknode($6.nd, $7.nd, "main"); $$.nd = mknode($1.nd, $2.nd, "program");head = $$.nd;};
+program: headers functlist {$$.nd=mknode($1.nd,$2.nd,"program");head1=$$.nd;}
+;
+
+functlist:func func {$$.nd=mknode($1.nd,$2.nd,"functions")}
+|func{$$.nd=$1.nd}
+
+func: datatype ID {add_fname();ff=get_findex($2.name);add('F');} '(' args  ')' '{' body return '}'{
+	struct node *t=mknode($8.nd,$9.nd,"func_body");
+	struct node *t1=mknode($5.nd,t,"func_args_body");
+	$2.nd=mknode(NULL,NULL,$2.name);
+	struct node *t2=mknode($2.nd,$1.nd,"func_name_data_type");
+	$$.nd=mknode(t2,t1,"function");
+	node *t3=$$.nd;
+	t3->f_index=ff;
+	t3->f_name=$2.nd->name;
+	t2->f_index=ff;
+	t2->f_name=$2.nd->name;
+	t1->f_index=ff;
+	t1->f_name=$2.nd->name;
+	if(strcmp($2.name,"main")==0){
+		head=$$.nd;
+	}
+}
+;
+
+
+
+args:arg ',' arg {$$.nd=mknode($1.nd,$3.nd,"args")}
+|arg ',' args {$$.nd=mknode($1.nd,$3.nd,"args")}
+|arg {$$.nd=$1.nd}
+|{$$.nd=NULL}
+;
+
+arg:datatype ID {add('V');$2.nd=mknode(NULL,NULL,"Variable");$2.nd->id_name=$2.name;$$.nd=mknode($1.nd,$2.nd,"arg")}
+;
 
 headers: headers headers { $$.nd = mknode($1.nd, $2.nd, "headers"); }
-| INCLUDE { add('H'); } { $$.nd = mknode(NULL, NULL, $1.name); }
+| INCLUDE  { $$.nd = mknode(NULL, NULL, $1.name); }
 ;
 
-main: datatype ID { add('F');  }
-;
 
-datatype: INT { insert_type(); }
-| FLOAT { insert_type(); }
-| CHAR { insert_type(); }
-| VOID { insert_type(); }
+
+datatype: INT { insert_type(); $$.nd=mknode(NULL,NULL,$1.name) }
+| FLOAT { insert_type();$$.nd=mknode(NULL,NULL,$1.name) }
+| CHAR { insert_type();$$.nd=mknode(NULL,NULL,$1.name) }
 ;
 
 temp1: statement{printf("ef \n");$$.nd=$1.nd;}
@@ -179,7 +217,6 @@ statement: datatype ID {add('V'); gg=get_index($2.name)} init temp2 {
 	$1.nd->id_name=$1.name;
 	$1.nd->name="Variable";
 	if(u){
-		printf("enter\n");
 		char *id_type = get_type($1.name);
 	
 		if(strcmp(id_type, $3.type)) {
@@ -335,7 +372,7 @@ value: NUMBER { $1.nd=mknode(NULL,NULL,"const");$1.nd->name="const";$1.nd->ty="n
 }
 ;
 
-return: RETURN { add('K'); } value ';' { check_return_type($3.name); $1.nd = mknode(NULL, NULL, "back"); $$.nd = mknode($1.nd, $3.nd, "RETURN"); }
+return: RETURN { add('K'); } value ';' {  $1.nd = mknode(NULL, NULL, "back"); $$.nd = mknode($1.nd, $3.nd, "RETURN"); }
 // | { $$.nd = NULL; }
 ;
 
@@ -351,12 +388,13 @@ int main() {
 	printf("\nLexical analysis completed with no errors\n");
 
 	printf("\n\n\t\t\t\t\t SYMBOL TABLE \n");
-	printf("\n\nSYMBOL   \t\t\t\tDATATYPE   \t\t\t\tTYPE   \t\t\t\t\tLINE NUMBER \n");
+	printf("\n\nSYMBOL   \t\t\t\tDATATYPE   \t\t\t\tTYPE   \t\t\t\t\tLINE NUMBER \t\t\t\tFUNCTIONNAME\n");
 	printf("____________________________________________________________________________________________________________________________________________\n\n");
 	int i=0;
 	
-	for(i=0; i<count; i++) {
-		printf("%s\t\t\t\t\t%s\t\t\t\t\t%s\t\t\t\t\t%d\t\t\t\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].line_no);
+	for(i=0; i<f_c; i++) {
+		for(int j=0;j<function_table[i].sym_i;j++)
+		printf("%s\t\t\t\t\t%s\t\t\t\t\t%s\t\t\t\t\t%d\t\t\t\t%s\t\t\t\t\n", function_table[i].func_sym_table[j].id_name, function_table[i].func_sym_table[j].data_type, function_table[i].func_sym_table[j].type,function_table[i].func_sym_table[j].line_no ,function_table[i].func_name);
 	}
 	
 	
@@ -386,19 +424,45 @@ int main() {
 		}
 	}
 	printf("OUTPUT \n\n");
+	traverse(head1);
 	ex(head);
+	
 }
 
 int search(char *type) {
 	int i;
-	for(i=count-1; i>=0; i--) {
-		if(strcmp(symbol_table[i].id_name, type)==0) {
+	for(i=function_table[f_c-1].sym_i-1; i>=0; i--) {
+		if(strcmp(function_table[f_c-1].func_sym_table[i].id_name, type)==0) {
+			return -i;
+			break;
+		}
+	}
+	// int i;
+	// for(i=count-1; i>=0; i--) {
+	// 	if(strcmp(symbol_table[i].id_name, type)==0) {
+	// 		return -i;
+	// 		break;
+	// 	}
+	// }
+	return 0;
+}
+int search_fname(char *type) {
+	int i;
+	for(i=f_c-1; i>=0; i--) {
+		if(strcmp(function_table[i].func_name, type)==0) {
 			return -i;
 			break;
 		}
 	}
 	return 0;
 }
+
+int get_findex(char *c){
+	int q1=search_fname(c);
+	int u=-q1;
+	return u;
+}
+
 int  get_index(char *c) {
     q = search(c);
 	int u=-q;
@@ -462,64 +526,96 @@ char *get_type(char *var){
 		}
 	}
 }
-
-int add(char c) {
-	if(c == 'V'){
-		for(int i=0; i<sizeof(reserved); i++){
-			if(!strcmp(reserved[i], strdup(yytext))){
-        		sprintf(errors[sem_errors], "Line %d: Variable name \"%s\" is a reserved keyword!\n", countn+1, yytext);
-				sem_errors++;
-				return -1;
-			}
-		}
+void add_fname(){
+	
+	int q1=search_fname(yytext);
+	
+	if(!q1){
+		function_table[f_c].func_name=strdup(yytext);
+		function_table[f_c].line_no=countn;
+		function_table[f_c].func_data_type=strdup(type);
+		f_c++;
 	}
+	
+}
+void add(char c) {
+	// if(c == 'V'){
+	// 	for(int i=0; i<sizeof(reserved); i++){
+	// 		if(!strcmp(reserved[i], strdup(yytext))){
+    //     		sprintf(errors[sem_errors], "Line %d: Variable name \"%s\" is a reserved keyword!\n", countn+1, yytext);
+	// 			sem_errors++;
+	// 		}
+	// 	}
+	// }
+	
     q=search(yytext);
+	
 	if(!q) {
-		if(c == 'H') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Header");
-			count++;
-			return -1;
-		}
-		else if(c == 'K') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup("N/A");
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Keyword\t");
-			count++;
-			return -1;
+		// if(c == 'H') {
+		// 	function_table[ff].func_sym_table[function_table[ff].sym_i].id_name=strdup(yytext);
+		// 	function_table[ff].func_sym_table[function_table[ff].sym_i].data_type=strdup(type);
+		// 	function_table[ff].func_sym_table[function_table[ff].sym_i].line_no=countn+1;
+		// 	function_table[ff].func_sym_table[function_table[ff].sym_i].type=strdup("Header");
+		// 	function_table[ff].sym_i++;
+		// 	// symbol_table[count].id_name=strdup(yytext);
+		// 	// symbol_table[count].data_type=strdup(type);
+		// 	// symbol_table[count].line_no=countn;
+		// 	// symbol_table[count].type=strdup("Header");
+		// 	// count++;
+		// }
+		// else 
+		if(c == 'K') {
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].id_name=strdup(yytext);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].data_type=strdup("N/A");
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].line_no=countn+1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].type=strdup("Keyword");
+			function_table[f_c-1].sym_i++;
+			// symbol_table[count].id_name=strdup(yytext);
+			// symbol_table[count].data_type=strdup("N/A");
+			// symbol_table[count].line_no=countn;
+			// symbol_table[count].type=strdup("Keyword\t");
+			// count++;
 		}
 		else if(c == 'V') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Variable");
-			count++;
-			return count-1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].id_name=strdup(yytext);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].data_type=strdup(type);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].line_no=countn+1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].type=strdup("Variable");
+			function_table[f_c-1].sym_i++;
+			// symbol_table[count].id_name=strdup(yytext);
+			// symbol_table[count].data_type=strdup(type);
+			// symbol_table[count].line_no=countn;
+			// symbol_table[count].type=strdup("Variable");
+			// count++;
 		}
 		else if(c == 'C') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup("CONST");
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Constant");
-			count++;
-			return -1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].id_name=strdup(yytext);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].data_type=strdup("CONST");
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].line_no=countn+1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].type=strdup("Constant");
+			function_table[f_c-1].sym_i++;
+			// symbol_table[count].id_name=strdup(yytext);
+			// symbol_table[count].data_type=strdup("CONST");
+			// symbol_table[count].line_no=countn;
+			// symbol_table[count].type=strdup("Constant");
+			// count++;
 		}
 		else if(c == 'F') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Function");
-			count++;
-			return -1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].id_name=strdup(yytext);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].data_type=strdup(type);
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].line_no=countn+1;
+			function_table[f_c-1].func_sym_table[function_table[f_c-1].sym_i].type=strdup("Function");
+			function_table[f_c-1].sym_i++;
+			// symbol_table[count].id_name=strdup(yytext);
+			// symbol_table[count].data_type=strdup(type);
+			// symbol_table[count].line_no=countn;
+			// symbol_table[count].type=strdup("Function");
+			// count++;
 		}
     }
     else if(c == 'V' && q) {
         sprintf(errors[sem_errors], "Line %d: Multiple declarations of \"%s\" not allowed!\n", countn+1, yytext);
 		sem_errors++;
-		return -1;
     }
 }
 
